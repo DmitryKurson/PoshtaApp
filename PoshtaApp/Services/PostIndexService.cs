@@ -9,57 +9,73 @@ using System.Globalization;
 
 namespace PoshtaApp.Services
 {
-    public class PostIndexService
+    public class PostIndexService :IPostIndexService
     {
-        //private readonly ApplicationContext _context;
+        private readonly ApplicationContext _context;
 
-        //public PostIndexService(ApplicationContext context)
-        //{
-        //    _context = context;
-        //}
+        public PostIndexService(ApplicationContext context)
+        {
+            _context = context;
+        }
 
-        //public async Task<bool> ImportIndexesFromCsvAsync(IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //        return false;
+        public async Task<bool> ImportIndexesFromCsvAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return false;
 
-        //    using var stream = file.OpenReadStream();
-        //    using var reader = new StreamReader(stream);
-        //    using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
-        //    {
-        //        Delimiter = ";",
-        //        Encoding = System.Text.Encoding.UTF8
-        //    });
+            using var stream = file.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = ";",
+                Encoding = System.Text.Encoding.UTF8
+            });
 
-        //    var records = csv.GetRecords<CsvIndexModel>().ToList();
+            var records = csv.GetRecords<CsvIndexModel>().ToList();
 
-        //    foreach (var record in records)
-        //    {
-        //        var obl = await _context.Oblasti.FirstOrDefaultAsync(o => o.Name == record.OblName);
-        //        var kraj = await _context.Kraj.FirstOrDefaultAsync(k => k.Name == record.KrajName);
-        //        var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == record.CityName);
+            foreach (var record in records)
+            {
+                var obl = await _context.Oblasti.FirstOrDefaultAsync(o => o.Name == record.OblName);
+                var kraj = await _context.Kraj.FirstOrDefaultAsync(k => k.Name == record.KrajName);
+                var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == record.CityName);
 
-        //        var aup = new Aup
-        //        {
-        //            Index = record.Index,
-        //            CityId = city?.Id,
-        //            CityName = record.CityName,
-        //            OblId = obl?.Id,
-        //            OblName = record.OblName,
-        //            KrajId = kraj?.Id,
-        //            KrajName = record.KrajName
-        //        };
+                var aup = new Aup
+                {
+                    Index = record.Index,
+                    CityId = city?.Id,
+                    CityName = record.CityName,
+                    OblId = obl?.Id,
+                    OblName = record.OblName,
+                    KrajId = kraj?.Id,
+                    KrajName = record.KrajName
+                };
 
-        //        _context.Aup.Add(aup);
-        //    }
+                _context.Aup.Add(aup);
+            }
 
-        //    await _context.SaveChangesAsync();
-        //    return true;
-        //}
-        //public async Task<List<Aup>> GetIndexesByCityAsync(string cityName)
-        //{
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
-        //}
+        public async Task<List<Aup>> GetIndexesWithoutCityAsync()
+        {
+            return await _context.Aup.Where(a => a.CityId == null).ToListAsync();
+        }
+
+        public async Task<List<Aup>> GetIndexesWithoutRegionAsync()
+        {
+            return await _context.Aup.Where(a => a.KrajId == null).ToListAsync();
+        }
+
+        public async Task<List<Aup>> GetIndexesWithoutOblastAsync()
+        {
+            return await _context.Aup.Where(a => a.OblId == null).ToListAsync();
+        }
+
+        public async Task<List<Aup>> GetAllIndexesAsync()
+        {
+            return await _context.Aup.ToListAsync();
+        }
     }
 
 }

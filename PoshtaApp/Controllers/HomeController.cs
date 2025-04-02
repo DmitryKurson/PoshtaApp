@@ -1,21 +1,22 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PoshtaApp.Models;
+using PoshtaApp.Services;
+using PoshtaApp.ViewModels;
 
 namespace PoshtaApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly CityService _cityService;
+        private readonly RegionService _regionService;
+        private readonly PostIndexService _postIndexService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(CityService cityService, RegionService regionService, PostIndexService postIndexService)
         {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
+            _cityService = cityService;
+            _regionService = regionService;
+            _postIndexService = postIndexService;
         }
 
         public IActionResult Privacy()
@@ -23,10 +24,23 @@ namespace PoshtaApp.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public async Task<IActionResult> Index()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var cities = await _cityService.GetAllCitiesAsync();
+            var oblasti = await _regionService.GetAllOblastiAsync();
+            var kraji = await _regionService.GetAllKrajiAsync();
+            var indexes = await _postIndexService.GetAllIndexesAsync();
+
+            var model = new HomeViewModel
+            {
+                Cities = cities,
+                Oblasti = oblasti,
+                Kraji = kraji,
+                Indexes = indexes
+            };
+
+            return View(model);
         }
+
     }
 }

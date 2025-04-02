@@ -1,8 +1,46 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model PoshtaApp.ViewModels.HomeViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Поштові індекси</h1>
+
+<h2>Міста</h2>
+<ul>
+    @foreach (var city in Model.Cities)
+    {
+        <li>@city.Name</li>
+    }
+</ul>
+
+<h2>Області</h2>
+<ul>
+    @foreach (var obl in Model.Oblasti)
+    {
+        <li>@obl.Name</li>
+    }
+</ul>
+
+<h2>Райони</h2>
+<ul>
+    @foreach (var kraj in Model.Kraji)
+    {
+        <li>@kraj.Name</li>
+    }
+</ul>
+
+<h2>Поштові індекси</h2>
+<table border="1">
+    <tr>
+        <th>Індекс</th>
+        <th>Місто</th>
+        <th>Область</th>
+        <th>Район</th>
+    </tr>
+    @foreach (var index in Model.Indexes)
+    {
+        <tr>
+            <td>@index.Index</td>
+            <td>@index.CityName</td>
+            <td>@index.OblName</td>
+            <td>@index.KrajName</td>
+        </tr>
+    }
+</table>

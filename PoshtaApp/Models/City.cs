@@ -13,7 +13,7 @@ namespace PoshtaApp.Models
         public string Name { get; set; } = string.Empty;  // Назва міста (CITY)
 
         public int? KrajId { get; set; }  // Код району (може бути NULL)
-        public Kraj? Kraj { get; set; }  // Навігаційна властивість
+        public Raj? Kraj { get; set; }  // Навігаційна властивість
 
         public int OblId { get; set; }  // Код області (OBL)
         public Obl Obl { get; set; } = null!;  // Навігаційна властивість
