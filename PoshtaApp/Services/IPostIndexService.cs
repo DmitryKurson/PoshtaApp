@@ -10,6 +10,5 @@ namespace PoshtaApp.Services
         Task<List<Aup>> GetIndexesWithoutRegionAsync();
         Task<List<Aup>> GetIndexesWithoutOblastAsync();
         Task<List<Aup>> GetAllIndexesAsync();
-
     }
 }

@@ -24,41 +24,30 @@ namespace PoshtaApp.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetAllPostIndex()
+        [HttpGet]
+        public async Task<IActionResult> Index(string filter = "all")
         {
-            var cities = await _cityService.GetAllCitiesAsync();
-            var oblasti = await _regionService.GetAllOblastiAsync();
-            var kraji = await _regionService.GetAllKrajiAsync();
-            var indexes = await _postIndexService.GetAllIndexesAsync();
+            List<Aup> indexes;
 
-            var model = new HomeViewModel
+            switch (filter)
             {
-                Cities = cities,
-                Oblasti = oblasti,
-                Kraji = kraji,
-                Indexes = indexes
-            };
+                case "noCity":
+                    indexes = await _postIndexService.GetIndexesWithoutCityAsync();
+                    break;
+                case "noRegion":
+                    indexes = await _postIndexService.GetIndexesWithoutRegionAsync();
+                    break;
+                case "noOblast":
+                    indexes = await _postIndexService.GetIndexesWithoutOblastAsync();
+                    break;
+                default:
+                    indexes = await _postIndexService.GetAllIndexesAsync();
+                    break;
+            }
 
-            return View(model);
+            ViewBag.Filter = filter;
+            ViewBag.Count = indexes.Count;
+            return View(indexes);
         }
-
-
-        //public async Task<IActionResult> GetIndexWithoutCity()
-        //{
-        //    var cities = await _cityService.GetAllCitiesAsync();
-        //    var oblasti = await _regionService.GetAllOblastiAsync();
-        //    var kraji = await _regionService.GetAllKrajiAsync();
-        //    var indexes = await _postIndexService.GetAllIndexesAsync();
-
-        //    var model = new HomeViewModel
-        //    {
-        //        Cities = cities,
-        //        Oblasti = oblasti,
-        //        Kraji = kraji,
-        //        Indexes = indexes
-        //    };
-
-        //    return View(model);
-        //}
     }
 }

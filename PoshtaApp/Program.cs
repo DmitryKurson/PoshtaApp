@@ -29,7 +29,7 @@ namespace PoshtaApp
             var scope = app.Services.CreateScope();
             var postIndexService = scope.ServiceProvider.GetRequiredService<IPostIndexService>();
 
-            await postIndexService.ImportFromExcelAsync();
+            //await postIndexService.ImportFromExcelAsync();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

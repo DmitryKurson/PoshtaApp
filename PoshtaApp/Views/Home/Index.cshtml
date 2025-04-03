@@ -1,46 +1,67 @@
-﻿@model PoshtaApp.ViewModels.HomeViewModel
+﻿@model List<PoshtaApp.Models.Aup>
 
-<h1>Поштові індекси</h1>
-
-<h2>Міста</h2>
-<ul>
-    @foreach (var city in Model.Cities)
-    {
-        <li>@city.Name</li>
-    }
-</ul>
-
-<h2>Області</h2>
-<ul>
-    @foreach (var obl in Model.Oblasti)
-    {
-        <li>@obl.Name</li>
-    }
-</ul>
-
-<h2>Райони</h2>
-<ul>
-    @foreach (var kraj in Model.Kraji)
-    {
-        <li>@kraj.Name</li>
-    }
-</ul>
+@{
+    ViewData["Title"] = "Поштові індекси";
+}
 
 <h2>Поштові індекси</h2>
-<table border="1">
-    <tr>
-        <th>Індекс</th>
-        <th>Місто</th>
-        <th>Область</th>
-        <th>Район</th>
-    </tr>
-    @foreach (var index in Model.Indexes)
+
+@{
+    var filterOptions = new List<SelectListItem>
     {
-        <tr>
-            <td>@index.Index</td>
-            <td>@index.CityName</td>
-            <td>@index.OblName</td>
-            <td>@index.RajName</td>
-        </tr>
+        new SelectListItem { Text = "Всі індекси", Value = "all", Selected = (ViewBag.Filter == "all") },
+        new SelectListItem { Text = "Без міста", Value = "noCity", Selected = (ViewBag.Filter == "noCity") },
+        new SelectListItem { Text = "Без району", Value = "noRegion", Selected = (ViewBag.Filter == "noRegion") },
+        new SelectListItem { Text = "Без області", Value = "noOblast", Selected = (ViewBag.Filter == "noOblast") }
+    };
+}
+
+<label for="filter">Фільтр:</label>
+<select id="filter" onchange="applyFilter()">
+    @foreach (var option in filterOptions)
+    {
+        <option value="@option.Value" selected="@(option.Selected ? "selected" : null)">@option.Text</option>
     }
+</select>
+
+<script>
+    function applyFilter() {
+        var selectedValue = document.getElementById("filter").value;
+        window.location.href = "/Home/Index?filter=" + selectedValue;
+    }
+</script>
+
+
+
+<h3>Знайдено: @ViewBag.Count</h3>
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Індекс</th>
+            <th>Місто</th>
+            <th>Район</th>
+            <th>Область</th>
+        </tr>
+    </thead>
+    <tbody id="indexTableBody">
+        @foreach (var index in Model)
+        {
+            <tr>
+                <td>@index.Index</td>
+                <td>@(index.CityName ?? "Немає")</td>
+                <td>@(index.RajName ?? "Немає")</td>
+                <td>@(index.OblName ?? "Немає")</td>
+            </tr>
+        }
+    </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        document.getElementById("filterSelect").addEventListener("change", function () {
+            const selectedFilter = this.value;
+            window.location.href = `/Home/Index?filter=${selectedFilter}`;
+        });
+    </script>
+}
