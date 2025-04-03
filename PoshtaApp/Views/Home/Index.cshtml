@@ -32,9 +32,16 @@
 </script>
 
 
-
+<br />
 <h3>Знайдено: @ViewBag.Count</h3>
+<br />
 
+<form action="/Home/ExportIndexesToCsv" method="get">
+    <input type="hidden" name="filter" value="@ViewBag.Filter" />
+    <button type="submit" class="btn btn-primary">Експортувати в CSV</button>
+</form>
+
+<br />
 <table class="table table-bordered mt-3">
     <thead>
         <tr>
