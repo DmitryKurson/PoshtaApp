@@ -23,7 +23,7 @@ namespace PoshtaApp.Controllers
             _postIndexService = postIndexService;
         }
 
-        public IActionResult Privacy()
+        public IActionResult About()
         {
             return View();
         }
