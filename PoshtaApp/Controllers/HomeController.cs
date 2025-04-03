@@ -57,8 +57,6 @@ namespace PoshtaApp.Controllers
         public async Task<IActionResult> ExportIndexesToCsv(string filter)
         {
             List<Aup> indexes;
-
-            // Отримуємо індекси за фільтром
             switch (filter)
             {
                 case "noCity":
@@ -75,24 +73,16 @@ namespace PoshtaApp.Controllers
                     break;
             }
 
-            // Створюємо MemoryStream для CSV
             var memoryStream = new MemoryStream();
 
-            // Використовуємо StreamWriter для запису в потік
             using (var writer = new StreamWriter(memoryStream, Encoding.UTF8, 1024, leaveOpen: true))
             {
-                // Використовуємо CsvWriter для запису в CSV
                 using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";" }))
                 {
-                    // Записуємо дані в CSV
                     csv.WriteRecords(indexes);
                 }
             }
-
-            // Потрібно перемістити курсор назад на початок потоку
             memoryStream.Seek(0, SeekOrigin.Begin);
-
-            // Повертаємо файл для завантаження
             return File(memoryStream.ToArray(), "text/csv", "indexes.csv");
         }
 

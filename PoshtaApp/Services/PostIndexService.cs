@@ -43,7 +43,6 @@ namespace PoshtaApp.Services
                         ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
                         {
                             UseHeaderRow = true,
-                            //ReadHeaderRow = (rowReader) => rowReader.Read() // Пропускає перший рядок, якщо треба.
                         }
                     });
 
@@ -51,10 +50,10 @@ namespace PoshtaApp.Services
 
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        var index = row[5].ToString();  // F2
-                        var cityName = row[4].ToString(); // E2
-                        var rajName = row[3].ToString();  // D2
-                        var oblName = row[1].ToString();  // B2
+                        var index = row[5].ToString(); 
+                        var cityName = row[4].ToString(); 
+                        var rajName = row[3].ToString(); 
+                        var oblName = row[1].ToString(); 
 
                         // Пошук існуючих даних у базі
                         var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == cityName);
