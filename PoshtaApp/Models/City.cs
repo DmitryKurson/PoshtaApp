@@ -1,22 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PoshtaApp.Models;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace PoshtaApp.Models
+public class City
 {
-    public class City
-    {
-        [Key]
-        [MaxLength(20)]
-        public string Id { get; set; } = string.Empty;  // Код міста (CITY_KOD)
+    [Key]
+    [MaxLength(20)]
+    public string Id { get; set; }
 
-        [Required]
-        [MaxLength(50)]
-        public string Name { get; set; } = string.Empty;  // Назва міста (CITY)
+    [Required]
+    [MaxLength(50)]
+    public string Name { get; set; } = string.Empty;
 
-        public int? KrajId { get; set; }  // Код району (може бути NULL)
-        public Raj? Kraj { get; set; }  // Навігаційна властивість
+    [MaxLength(5)]
+    public int? RajId { get; set; }
+    [ForeignKey("RajId")]
+    public Raj? Raj { get; set; }
 
-        public int OblId { get; set; }  // Код області (OBL)
-        public Obl Obl { get; set; } = null!;  // Навігаційна властивість
-    }
 
+    [MaxLength(4)]
+    public int? OblId { get; set; }
+    [ForeignKey("OblId")]
+    public Obl? Obl { get; set; }
+
+    public List<Aup> Aups { get; set; } = new();
 }

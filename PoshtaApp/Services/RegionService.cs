@@ -33,15 +33,5 @@ namespace PoshtaApp.Services
         {
             return await _context.Rajs.FirstOrDefaultAsync(k => k.Name == name);
         }
-        public async Task<List<Raj>> GetAllRegionsAsync()
-        {
-            return await _context.Rajs.ToListAsync();
-        }
-
-        public async Task<Raj?> GetRegionByNameAsync(string name)
-        {
-            return await _context.Rajs.FirstOrDefaultAsync(r => r.Name == name);
-        }
     }
-
 }

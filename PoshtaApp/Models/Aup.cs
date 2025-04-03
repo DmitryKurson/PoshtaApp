@@ -1,25 +1,41 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PoshtaApp.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PoshtaApp.Models
+public class Aup
 {
-    public class Aup
-    {
-        [Key]
-        public int Id { get; set; }  // Унікальний ID
+    [Key]
+    [MaxLength(10)]
+    public int Id { get; set; }
 
-        [Required]
-        [MaxLength(6)]
-        public string Index { get; set; } = string.Empty;  // Поштовий індекс (INDEX_A)
+    [Required]
+    [MaxLength(6)]
+    public string Index { get; set; } = string.Empty;
 
-        public string? CityId { get; set; }  // Код міста (CITY_KOD)
-        public City? City { get; set; }  // Навігаційна властивість
+    // Foreign Key на Cities
+    [MaxLength(20)]
+    public string? CityId { get; set; }
+    [ForeignKey("CityId")]
+    public City? City { get; set; }
+    [MaxLength(200)]
+    public string? CityName { get; set; }
 
-        public string? CityName { get; set; }  // Назва міста (NCITY)
 
-        public int? OblId { get; set; }  // Код області (OBL)
-        public string? OblName { get; set; }  // Назва області (NOBL)
+    // Foreign Key на Oblasti
+    [MaxLength(4)]
+    public int? OblId { get; set; }
+    [ForeignKey("OblId")]
+    public Obl? Obl { get; set; }
 
-        public int? KrajId { get; set; }  // Код району (RAJ)
-        public string? KrajName { get; set; }  // Назва району (NRAJ)
-    }
+    [MaxLength(200)]
+    public string? OblName { get; set; }
+
+
+    // Foreign Key на Rais
+    [MaxLength(5)]
+    public int? RajId { get; set; }
+    [ForeignKey("RajId")]
+    public Raj? Raj { get; set; }
+    [MaxLength(200)]
+    public string? RajName { get; set; }
 }

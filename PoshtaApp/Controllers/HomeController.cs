@@ -8,11 +8,11 @@ namespace PoshtaApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly CityService _cityService;
-        private readonly RegionService _regionService;
-        private readonly PostIndexService _postIndexService;
+        private readonly ICityService _cityService;
+        private readonly IRegionService _regionService;
+        private readonly IPostIndexService _postIndexService;
 
-        public HomeController(CityService cityService, RegionService regionService, PostIndexService postIndexService)
+        public HomeController(ICityService cityService, IRegionService regionService, IPostIndexService postIndexService)
         {
             _cityService = cityService;
             _regionService = regionService;
@@ -24,7 +24,7 @@ namespace PoshtaApp.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> GetAllPostIndex()
         {
             var cities = await _cityService.GetAllCitiesAsync();
             var oblasti = await _regionService.GetAllOblastiAsync();
@@ -42,5 +42,23 @@ namespace PoshtaApp.Controllers
             return View(model);
         }
 
+
+        //public async Task<IActionResult> GetIndexWithoutCity()
+        //{
+        //    var cities = await _cityService.GetAllCitiesAsync();
+        //    var oblasti = await _regionService.GetAllOblastiAsync();
+        //    var kraji = await _regionService.GetAllKrajiAsync();
+        //    var indexes = await _postIndexService.GetAllIndexesAsync();
+
+        //    var model = new HomeViewModel
+        //    {
+        //        Cities = cities,
+        //        Oblasti = oblasti,
+        //        Kraji = kraji,
+        //        Indexes = indexes
+        //    };
+
+        //    return View(model);
+        //}
     }
 }

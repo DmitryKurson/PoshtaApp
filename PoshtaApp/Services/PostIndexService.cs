@@ -1,60 +1,82 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using ExcelDataReader;
 using Microsoft.EntityFrameworkCore;
 using PoshtaApp.Data;
 using PoshtaApp.Models;
 using System;
+using System.Data;
 using System.Formats.Asn1;
 using System.Globalization;
+using System.Text;
 
 namespace PoshtaApp.Services
 {
     public class PostIndexService :IPostIndexService
     {
         private readonly ApplicationContext _context;
+        private readonly IConfiguration _configuration;
 
-        public PostIndexService(ApplicationContext context)
+
+        public PostIndexService(ApplicationContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
-        public async Task<bool> ImportIndexesFromCsvAsync(IFormFile file)
+        public async Task ImportFromExcelAsync()
         {
-            if (file == null || file.Length == 0)
-                return false;
+            string filePath = _configuration["ExcelFilePath"];
 
-            using var stream = file.OpenReadStream();
-            using var reader = new StreamReader(stream);
-            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"Файл не знайдено за шляхом {filePath}");
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
             {
-                Delimiter = ";",
-                Encoding = System.Text.Encoding.UTF8
-            });
-
-            var records = csv.GetRecords<CsvIndexModel>().ToList();
-
-            foreach (var record in records)
-            {
-                var obl = await _context.Oblasti.FirstOrDefaultAsync(o => o.Name == record.OblName);
-                var kraj = await _context.Kraj.FirstOrDefaultAsync(k => k.Name == record.KrajName);
-                var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == record.CityName);
-
-                var aup = new Aup
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    Index = record.Index,
-                    CityId = city?.Id,
-                    CityName = record.CityName,
-                    OblId = obl?.Id,
-                    OblName = record.OblName,
-                    KrajId = kraj?.Id,
-                    KrajName = record.KrajName
-                };
+                    var result = reader.AsDataSet(new ExcelDataSetConfiguration()
+                    {
+                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                        {
+                            UseHeaderRow = true,
+                            //ReadHeaderRow = (rowReader) => rowReader.Read() // Пропускає перший рядок, якщо треба.
+                        }
+                    });
 
-                _context.Aup.Add(aup);
+                    var dataTable = result.Tables[0];
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        var index = row[5].ToString();  // F2
+                        var cityName = row[4].ToString(); // E2
+                        var rajName = row[3].ToString();  // D2
+                        var oblName = row[1].ToString();  // B2
+
+                        // Пошук існуючих даних у базі
+                        var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == cityName);
+                        var raj = await _context.Rajs.FirstOrDefaultAsync(r => r.Name == rajName);
+                        var obl = await _context.Oblasti.FirstOrDefaultAsync(o => o.Name == oblName);
+
+                        var aup = new Aup
+                        {
+                            Index = index,
+                            CityName = cityName,
+                            RajName = rajName,
+                            OblName = oblName,
+                            CityId = city?.Id,
+                            RajId = raj?.Id,
+                            OblId = obl?.Id
+                        };
+
+                        _context.Aup.Add(aup);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
             }
-
-            await _context.SaveChangesAsync();
-            return true;
         }
 
         public async Task<List<Aup>> GetIndexesWithoutCityAsync()
@@ -64,7 +86,7 @@ namespace PoshtaApp.Services
 
         public async Task<List<Aup>> GetIndexesWithoutRegionAsync()
         {
-            return await _context.Aup.Where(a => a.KrajId == null).ToListAsync();
+            return await _context.Aup.Where(a => a.RajId == null).ToListAsync();
         }
 
         public async Task<List<Aup>> GetIndexesWithoutOblastAsync()
@@ -77,5 +99,4 @@ namespace PoshtaApp.Services
             return await _context.Aup.ToListAsync();
         }
     }
-
 }
